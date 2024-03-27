@@ -1,12 +1,13 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "zion",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "turbo test",
+    "build": "turbo build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "devDependencies": {
+    "turbo": "1.13.0",
+    "typescript": "5.4.3"
+  },
+  "packageManager": "pnpm@8.6.10"
 }

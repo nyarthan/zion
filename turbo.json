@@ -1,0 +1,10 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "test": { "inputs": ["vitest.config.ts", "test/**/*.ts", "src/**/*.ts"] },
+    "build": {
+      "inputs": ["tsconfig.json", "src/**/*.ts", "src/**/*.rs", "Cargo.toml"],
+      "outputs": ["target/**/*", "dist/**/*"]
+    }
+  }
+}

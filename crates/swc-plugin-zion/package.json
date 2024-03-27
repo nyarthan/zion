@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@zion/swc-plugin",
+  "main": "./dist/swc_plugin_zion.wasm",
+  "exports": {
+    ".": "./dist/swc_plugin_zion.wasm"
+  },
+  "files": [
+    "./dist/swc_plugin_zion.wasm"
+  ],
+  "scripts": {
+    "test": "cargo test",
+    "test:watch": "cargo watch test",
+    "build": "cargo build --target wasm32-wasi --release && mkdir dist; cp target/wasm32-wasi/release/swc_plugin_zion.wasm dist/"
+  },
+  "devDependencies": {
+    "vite": "5.2.6",
+    "vitest": "1.4.0"
+  }
+}
