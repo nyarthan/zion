@@ -5,6 +5,14 @@
     "build": {
       "inputs": ["tsconfig.json", "src/**/*.ts", "src/**/*.rs", "Cargo.toml"],
       "outputs": ["target/**/*", "dist/**/*"]
+    },
+    "format": {
+      "inputs": ["**/*.{ts,js,json,yaml,yml,rs}"],
+      "outputs": ["**/*.{ts,js,json,yaml,yml,rs}"]
+    },
+    "root:format": {
+      "inputs": ["*.{ts,js,json,yaml,yaml,rs}"],
+      "outputs": ["*.{ts,js,json,yaml,yaml,rs}"]
     }
   }
 }

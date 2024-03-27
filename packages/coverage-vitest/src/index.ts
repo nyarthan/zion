@@ -1,4 +1,4 @@
-import type { TransformResult } from "vite";
+import type { TransformResult } from 'vite';
 import type {
   AfterSuiteRunMeta,
   CoverageProvider,
@@ -6,8 +6,9 @@ import type {
   ReportContext,
   ResolvedCoverageOptions,
   Vitest,
-} from "vitest";
-import { noop } from "./util";
+} from 'vitest';
+
+import { noop } from './util';
 
 const ProviderModule: CoverageProviderModule = {
   getProvider(): CoverageProvider {
@@ -16,16 +17,14 @@ const ProviderModule: CoverageProviderModule = {
 };
 
 class Provider implements CoverageProvider {
-  public name = "zion";
+  public name = 'zion';
   private options!: ResolvedCoverageOptions;
 
   public initialize(ctx: Vitest): void | Promise<void> {
-    this.options = { ...ctx.config.coverage, provider: "istanbul" };
+    this.options = { ...ctx.config.coverage, provider: 'istanbul' };
   }
 
-  public resolveOptions(): ResolvedCoverageOptions<
-    "istanbul" | "v8" | "custom" | undefined
-  > {
+  public resolveOptions(): ResolvedCoverageOptions<'istanbul' | 'v8' | 'custom' | undefined> {
     return this.options;
   }
 
@@ -33,9 +32,7 @@ class Provider implements CoverageProvider {
     noop(clean);
   }
 
-  reportCoverage(
-    reportContext?: ReportContext | undefined,
-  ): void | Promise<void> {
+  reportCoverage(reportContext?: ReportContext | undefined): void | Promise<void> {
     noop(reportContext);
   }
 

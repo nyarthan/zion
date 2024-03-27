@@ -11,7 +11,9 @@
   "scripts": {
     "test": "cargo test",
     "test:watch": "cargo watch test",
-    "build": "cargo build --target wasm32-wasi --release && mkdir dist; cp target/wasm32-wasi/release/swc_plugin_zion.wasm dist/"
+    "build": "cargo build --target wasm32-wasi --release && mkdir dist; cp target/wasm32-wasi/release/swc_plugin_zion.wasm dist/",
+    "format": "prettier --write package.json; cargo fmt",
+    "format:check": "prettier --check package.json; cargo fmt --check"
   },
   "devDependencies": {
     "vite": "5.2.6",

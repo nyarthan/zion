@@ -1,15 +1,16 @@
-import { createRequire } from "node:module";
-import { transform, Options } from "@swc/core";
+import { createRequire } from 'node:module';
+
+import { Options, transform } from '@swc/core';
 
 const require = createRequire(import.meta.url);
-const pluginPath = require.resolve("@zion/swc-plugin");
+const pluginPath = require.resolve('@zion/swc-plugin');
 
 console.debug({ pluginPath });
 
 const options: Options = {
   jsc: {
     parser: {
-      syntax: "ecmascript",
+      syntax: 'ecmascript',
       jsx: true,
     },
     experimental: {
