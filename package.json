@@ -1,12 +1,21 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "zion",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "turbo test",
+    "build": "turbo build",
+    "format": "turbo format root:format",
+    "format:check": "turbo format:check",
+    "root:format": "prettier --write ./*.*",
+    "root:format:check": "prettier --check ./*.*"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "devDependencies": {
+    "@titanom/prettier-config": "2.0.0",
+    "@types/node": "20.11.30",
+    "prettier": "3.2.5",
+    "turbo": "1.13.0",
+    "typescript": "5.4.3"
+  },
+  "packageManager": "pnpm@8.6.10"
 }

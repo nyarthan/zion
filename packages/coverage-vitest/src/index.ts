@@ -1,4 +1,4 @@
-import type { TransformResult } from "vite";
+import type { TransformResult } from 'vite';
 import type {
   AfterSuiteRunMeta,
   CoverageProvider,
@@ -6,26 +6,43 @@ import type {
   ReportContext,
   ResolvedCoverageOptions,
   Vitest,
-} from "vitest";
-import { noop } from "./util";
+} from 'vitest';
+
+import { instrument } from '@zion/instrument';
+
+import { noop } from './util';
+
+type GlobalCoverage = Record<string, unknown>;
+
+declare global {
+  namespace globalThis {
+    var __ZION_COVERAGE__: GlobalCoverage;
+  }
+}
 
 const ProviderModule: CoverageProviderModule = {
   getProvider(): CoverageProvider {
     return new Provider();
   },
+
+  startCoverage() {
+    globalThis.__ZION_COVERAGE__ ||= {};
+  },
+
+  takeCoverage() {
+    return global.__ZION_COVERAGE__;
+  },
 };
 
 class Provider implements CoverageProvider {
-  public name = "zion";
+  public name = '@zion/coverage-vitest';
   private options!: ResolvedCoverageOptions;
 
   public initialize(ctx: Vitest): void | Promise<void> {
-    this.options = { ...ctx.config.coverage, provider: "istanbul" };
+    this.options = ctx.config.coverage;
   }
 
-  public resolveOptions(): ResolvedCoverageOptions<
-    "istanbul" | "v8" | "custom" | undefined
-  > {
+  public resolveOptions(): ResolvedCoverageOptions {
     return this.options;
   }
 
@@ -33,23 +50,24 @@ class Provider implements CoverageProvider {
     noop(clean);
   }
 
-  reportCoverage(
-    reportContext?: ReportContext | undefined,
-  ): void | Promise<void> {
+  reportCoverage(reportContext?: ReportContext | undefined): void | Promise<void> {
     noop(reportContext);
   }
 
   onAfterSuiteRun(meta: AfterSuiteRunMeta): void | Promise<void> {
-    noop(meta);
+    const coverage = meta.coverage as GlobalCoverage;
+    console.debug(coverage);
   }
 
-  onFileTransform(
+  async onFileTransform(
     sourceCode: string,
     id: string,
     pluginCtx: any,
-  ):
-    | (string | void | Partial<TransformResult> | null | undefined)
-    | Promise<string | void | Partial<TransformResult> | null | undefined> {
+  ): Promise<string | void | Partial<TransformResult> | null | undefined> {
+    if (id.includes('math.ts')) {
+      const { code } = await instrument(sourceCode);
+      return { code };
+    }
     noop(sourceCode, id, pluginCtx);
   }
 }
