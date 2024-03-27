@@ -10,6 +10,9 @@ use swc_core::{
 
 pub struct TransformVisitor;
 
+const COVERAGE_GLOBAL: &'static str = "globalThis";
+const COVERAGE_KEY: &'static str = "__ZION_COVERAGE__";
+
 impl VisitMut for TransformVisitor {
     fn visit_mut_arrow_expr(&mut self, arrow_expr: &mut ArrowExpr) {
         arrow_expr.visit_mut_children_with(self);
@@ -54,6 +57,96 @@ impl VisitMut for TransformVisitor {
             }));
         }
     }
+
+    fn visit_mut_module(&mut self, module: &mut Module) {
+        module.visit_mut_children_with(self);
+
+        module.body.insert(
+            0,
+            ModuleItem::Stmt(Stmt::Decl(Decl::Var(Box::new(VarDecl {
+                span: DUMMY_SP,
+                kind: VarDeclKind::Const,
+                decls: vec![VarDeclarator {
+                    span: DUMMY_SP,
+                    definite: false,
+                    init: Some(Box::new(Expr::Object(ObjectLit {
+                        span: DUMMY_SP,
+                        props: vec![],
+                    }))),
+                    name: Pat::Ident(BindingIdent {
+                        id: Ident {
+                            sym: "coverage".into(),
+                            optional: false,
+                            span: DUMMY_SP,
+                        },
+                        type_ann: None,
+                    }),
+                }],
+                declare: false,
+            })))),
+        );
+
+        module.body.push(ModuleItem::Stmt(Stmt::Expr(ExprStmt {
+            span: DUMMY_SP,
+            expr: Box::new(Expr::Assign(AssignExpr {
+                span: DUMMY_SP,
+                op: AssignOp::Assign,
+                left: AssignTarget::Simple(SimpleAssignTarget::Member(MemberExpr {
+                    span: DUMMY_SP,
+                    obj: Box::new(Expr::Ident(Ident {
+                        span: DUMMY_SP,
+                        optional: false,
+                        sym: COVERAGE_GLOBAL.into(),
+                    })),
+                    prop: MemberProp::Ident(Ident {
+                        span: DUMMY_SP,
+                        optional: false,
+                        sym: COVERAGE_KEY.into(),
+                    }),
+                })),
+                right: Box::new(Expr::Ident(Ident {
+                    span: DUMMY_SP,
+                    optional: false,
+                    sym: "coverage".into(),
+                })),
+            })),
+        })));
+    }
+
+    fn visit_mut_fn_decl(&mut self, fn_decl: &mut FnDecl) {
+        fn_decl.visit_mut_children_with(self);
+
+        if let Some(block_stmt) = &mut fn_decl.function.body {
+            block_stmt.stmts.insert(
+                0,
+                Stmt::Expr(ExprStmt {
+                    span: DUMMY_SP,
+                    expr: Box::new(Expr::Assign(AssignExpr {
+                        span: DUMMY_SP,
+                        op: AssignOp::Assign,
+                        left: AssignTarget::Simple(SimpleAssignTarget::Member(MemberExpr {
+                            span: DUMMY_SP,
+                            obj: Box::new(Expr::Ident(Ident {
+                                span: DUMMY_SP,
+                                optional: false,
+                                sym: "coverage".into(),
+                            })),
+                            prop: MemberProp::Ident(Ident {
+                                span: DUMMY_SP,
+                                optional: false,
+                                sym: "add".into(),
+                            }),
+                        })),
+                        right: Box::new(Expr::Lit(Lit::Num(Number {
+                            span: DUMMY_SP,
+                            value: 1.0,
+                            raw: None,
+                        }))),
+                    })),
+                }),
+            )
+        }
+    }
 }
 
 #[plugin_transform]
@@ -64,18 +157,20 @@ pub fn process_transform(program: Program, _metadata: TransformPluginProgramMeta
 test_inline!(
     Default::default(),
     |_| as_folder(TransformVisitor),
-    arrow_expr_add_console_log_hi,
+    module_coverage,
     // Input
     r#"
-const add = (a, b) => {
+function add(a, b) {
     return a + b;
-};
+}
 "#,
     // Output
     r#"
-const add = (a, b) => {
-    console.log("hi");
+const coverage = {};
+function add(a, b) {
+    coverage.add = 1;
     return a + b;
 }
+globalThis.__VITEST_COVERAGE__ = coverage;
 "#
 );

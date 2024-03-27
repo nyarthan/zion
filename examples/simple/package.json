@@ -1,11 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@zion/instrument",
+  "name": "@zion/example-simple",
   "type": "module",
-  "main": "./src/index.ts",
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -14,7 +14,6 @@
     "vitest": "1.4.0"
   },
   "dependencies": {
-    "@swc/core": "1.4.11",
-    "@zion/swc-plugin": "workspace:*"
+    "@zion/coverage-vitest": "workspace:*"
   }
 }

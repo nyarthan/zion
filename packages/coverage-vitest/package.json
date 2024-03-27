@@ -1,6 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@zion/coverage-vitest",
+  "type": "module",
+  "main": "./src/index.ts",
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
@@ -10,5 +12,8 @@
   "devDependencies": {
     "vite": "5.2.6",
     "vitest": "1.4.0"
+  },
+  "dependencies": {
+    "@zion/instrument": "workspace:*"
   }
 }

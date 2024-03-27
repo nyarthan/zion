@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@titanom/prettier-config": "2.0.0",
+    "@types/node": "20.11.30",
     "prettier": "3.2.5",
     "turbo": "1.13.0",
     "typescript": "5.4.3"
