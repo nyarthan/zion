@@ -1,4 +1,5 @@
 use misc::random_string;
+use swc_core::ecma::utils::prepend_stmt;
 use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata};
 use swc_core::{
     common::DUMMY_SP,
@@ -22,8 +23,8 @@ impl VisitMut for TransformVisitor {
     fn visit_mut_module(&mut self, module: &mut Module) {
         module.visit_mut_children_with(self);
 
-        module.body.insert(
-            0,
+        prepend_stmt(
+            &mut module.body,
             ModuleItem::Stmt(Stmt::Decl(Decl::Var(Box::new(VarDecl {
                 span: DUMMY_SP,
                 kind: VarDeclKind::Const,
@@ -51,7 +52,7 @@ impl VisitMut for TransformVisitor {
             span: DUMMY_SP,
             expr: Box::new(Expr::Assign(AssignExpr {
                 span: DUMMY_SP,
-                op: AssignOp::Assign,
+                op: op!("="),
                 left: AssignTarget::Simple(SimpleAssignTarget::Member(MemberExpr {
                     span: DUMMY_SP,
                     obj: ident_expr!(COVERAGE_GLOBAL),
@@ -76,7 +77,7 @@ impl VisitMut for TransformVisitor {
                     span: DUMMY_SP,
                     expr: Box::new(Expr::Assign(AssignExpr {
                         span: DUMMY_SP,
-                        op: AssignOp::Assign,
+                        op: op!("="),
                         left: AssignTarget::Simple(SimpleAssignTarget::Member(MemberExpr {
                             span: DUMMY_SP,
                             obj: ident_expr!(self.module_coverage_sym.clone()),
@@ -88,12 +89,12 @@ impl VisitMut for TransformVisitor {
                         })),
                         right: Box::new(Expr::Bin(BinExpr {
                             span: DUMMY_SP,
-                            op: BinaryOp::Add,
+                            op: op!(bin, "+"),
                             left: Box::new(Expr::Paren(ParenExpr {
                                 span: DUMMY_SP,
                                 expr: Box::new(Expr::Bin(BinExpr {
                                     span: DUMMY_SP,
-                                    op: BinaryOp::NullishCoalescing,
+                                    op: op!("??"),
                                     left: Box::new(Expr::Member(MemberExpr {
                                         span: DUMMY_SP,
                                         obj: ident_expr!(self.module_coverage_sym.clone()),
