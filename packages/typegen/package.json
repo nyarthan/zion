@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@zion/typegen",
+  "type": "module",
+  "exports": {
+    "./coverage-data": "./dist/coverage-data.json"
+  },
+  "scripts": {
+    "build": "tsx ./scripts/build.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "zod": "3.22.4",
+    "zod-to-json-schema": "3.22.5"
+  },
+  "devDependencies": {
+    "tsx": "4.7.1"
+  }
+}
