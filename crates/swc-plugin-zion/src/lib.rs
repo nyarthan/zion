@@ -1,4 +1,4 @@
-use misc::random_string;
+use misc::gen_coverage_symbol;
 use swc_core::ecma::utils::prepend_stmt;
 use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata};
 use swc_core::{
@@ -10,6 +10,7 @@ use swc_core::{
     },
 };
 
+mod coverage;
 mod misc;
 
 pub struct TransformVisitor {
@@ -138,10 +139,31 @@ macro_rules! ident_expr {
     };
 }
 
+#[macro_export]
+macro_rules! empty_coverage_data {
+    ($value:expr) => {
+        quote!(
+            r#"
+{
+    modulePath: '/path/to/module.js',
+    stmtMap: {},
+    fnMap: {},
+    branchMap: {},
+    coverage: {
+        stmt: {},
+        fn: {},
+        branch: {}
+    }
+}
+"# as Expr
+        )
+    };
+}
+
 #[plugin_transform]
 pub fn process_transform(program: Program, _metadata: TransformPluginProgramMetadata) -> Program {
     program.fold_with(&mut as_folder(TransformVisitor {
-        module_coverage_sym: format!("coverage_{}", random_string(6)),
+        module_coverage_sym: format!("coverage_{}", gen_coverage_symbol("this is a test")),
     }))
 }
 
