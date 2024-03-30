@@ -1,0 +1,26 @@
+[package]
+name = "swc_ast_derive"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "swc_ast_derive"
+path = "src/lib.rs"
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0.79"
+quote = "1.0.35"
+syn = { version = "2.0.55", features = ["extra-traits"] }
+swc_core = { version = "0.90.*", features = [
+	"ecma_plugin_transform",
+	"ecma_quote",
+	"ecma_utils",
+	"ecma_ast",
+	"ecma_codegen",
+	"ecma_parser",
+] }
+swc_ast_trait = { path = "../swc-ast-trait" }
+
+[dev-dependencies]
+insta = { version = "1.38.0", features = ["json"] }
