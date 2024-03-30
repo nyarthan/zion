@@ -1,0 +1,17 @@
+[package]
+name = "swc_ast_trait"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+swc_core = { version = "0.90.*", features = [
+	"ecma_plugin_transform",
+	"ecma_quote",
+	"ecma_utils",
+	"ecma_ast",
+	"ecma_codegen",
+	"ecma_parser",
+] }
+
+[dev-dependencies]
+insta = { version = "1.38.0", features = ["json"] }
