@@ -191,6 +191,26 @@ mod tests {
     }
 
     #[test]
+    fn optional_value_to_ast() {
+        let source = Some(String::from("this is a string"));
+        let code = to_js_code(source.to_ast_node());
+
+        assert_snapshot!(code, @r###"
+        "this is a string";
+        "###);
+    }
+
+    #[test]
+    fn optional_undefined_to_ast() {
+        let source: Option<String> = None;
+        let code = to_js_code(source.to_ast_node());
+
+        assert_snapshot!(code, @r###"
+        undefined;
+        "###);
+    }
+
+    #[test]
     fn vec_string_to_ast() {
         let source = vec![String::from("this is a string")];
         let code = to_js_code(source.to_ast_node());
@@ -253,6 +273,18 @@ mod tests {
             key: {
                 key: "value"
             }
+        };
+        "###);
+    }
+
+    #[test]
+    fn hashmap_optional_undefined_to_ast() {
+        let source = HashMap::from([(String::from("key"), None::<String>)]);
+        let code = to_js_code(source.to_ast_node());
+
+        assert_snapshot!(code, @r###"
+        {
+            key: undefined
         };
         "###);
     }
