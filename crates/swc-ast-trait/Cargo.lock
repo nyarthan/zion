@@ -1225,6 +1225,7 @@ version = "0.1.0"
 dependencies = [
  "insta",
  "swc_core",
+ "swc_helpers",
 ]
 
 [[package]]
@@ -1501,6 +1502,13 @@ dependencies = [
  "once_cell",
  "parking_lot",
  "swc_common",
+]
+
+[[package]]
+name = "swc_helpers"
+version = "0.1.0"
+dependencies = [
+ "swc_core",
 ]
 
 [[package]]

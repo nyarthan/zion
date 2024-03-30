@@ -123,47 +123,14 @@ where
 mod tests {
     use super::*;
 
-    use std::sync::Arc;
-
     use insta::assert_snapshot;
-    use swc_core::{
-        common::SourceMap,
-        ecma::codegen::{text_writer::JsWriter, Emitter},
-    };
 
-    fn to_js_code(source: impl ToAst) -> String {
-        let module = Module {
-            span: DUMMY_SP,
-            shebang: None,
-            body: vec![Stmt::Expr(ExprStmt {
-                span: DUMMY_SP,
-                expr: source.to_ast_node().into(),
-            })
-            .into()],
-        };
-
-        let cm = Arc::new(SourceMap::default());
-
-        let mut buf = Vec::new();
-
-        {
-            let mut emitter = Emitter {
-                cfg: Default::default(),
-                comments: None,
-                cm: cm.clone(),
-                wr: JsWriter::new(cm, "\n", &mut buf, None),
-            };
-
-            emitter.emit_module(&module).unwrap();
-        }
-
-        String::from_utf8_lossy(&buf).to_string()
-    }
+    use swc_helpers::to_js_code;
 
     #[test]
     fn string_to_ast() {
         let source = String::from("this is a string");
-        let code = to_js_code(source);
+        let code = to_js_code(source.to_ast_node());
 
         assert_snapshot!(code, @r###"
         "this is a string";
@@ -173,7 +140,7 @@ mod tests {
     #[test]
     fn bool_to_ast() {
         let source = true;
-        let code = to_js_code(source);
+        let code = to_js_code(source.to_ast_node());
 
         assert_snapshot!(code, @r###"
         true;
@@ -191,7 +158,7 @@ mod tests {
         let source_f32: f32 = 1.0;
         let source_f64: f64 = 1.0;
 
-        let code_u8 = to_js_code(source_u8);
+        let code_u8 = to_js_code(source_u8.to_ast_node());
         let node_u8 = source_u8.to_ast_node();
 
         assert_eq!(node_u8, source_u16.to_ast_node());
@@ -210,7 +177,7 @@ mod tests {
     #[test]
     fn vec_string_to_ast() {
         let source = vec![String::from("this is a string")];
-        let code = to_js_code(source);
+        let code = to_js_code(source.to_ast_node());
 
         assert_snapshot!(code, @r###"
         [
@@ -222,7 +189,7 @@ mod tests {
     #[test]
     fn vec_vec_string_to_ast() {
         let source = vec![vec![String::from("this is a string")]];
-        let code = to_js_code(source);
+        let code = to_js_code(source.to_ast_node());
 
         assert_snapshot!(code, @r###"
         [
@@ -239,8 +206,8 @@ mod tests {
         let source = HashSet::from([string.clone()]);
         let source2 = vec![string.clone()];
 
-        let code = to_js_code(source);
-        let code2 = to_js_code(source2);
+        let code = to_js_code(source.to_ast_node());
+        let code2 = to_js_code(source2.to_ast_node());
 
         assert_eq!(code, code2);
     }
@@ -248,7 +215,7 @@ mod tests {
     #[test]
     fn hashmap_string_to_ast() {
         let source = HashMap::from([(String::from("key"), String::from("value"))]);
-        let code = to_js_code(source);
+        let code = to_js_code(source.to_ast_node());
 
         assert_snapshot!(code, @r###"
         {
@@ -263,7 +230,7 @@ mod tests {
             String::from("key"),
             HashMap::from([(String::from("key"), String::from("value"))]),
         )]);
-        let code = to_js_code(source);
+        let code = to_js_code(source.to_ast_node());
 
         assert_snapshot!(code, @r###"
         {

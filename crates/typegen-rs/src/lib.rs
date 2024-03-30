@@ -5,9 +5,9 @@ import_types!(schema = "./schemas/coverage-data.json", derives = [Debug]);
 
 #[cfg(test)]
 mod test {
-    use insta::assert_snapshot;
-
     use super::*;
+
+    use insta::assert_snapshot;
 
     #[test]
     fn does_something() {

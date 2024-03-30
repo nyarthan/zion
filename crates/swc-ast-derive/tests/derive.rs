@@ -2,6 +2,7 @@ use insta::assert_snapshot;
 use swc_ast_derive::ToAstStruct;
 use swc_ast_trait::ToAst;
 use swc_core::{common::DUMMY_SP, ecma::ast::*};
+use swc_helpers::to_js_code;
 
 #[test]
 fn works() {
@@ -28,155 +29,19 @@ fn works() {
             string: String::from("string"),
         },
     };
-    let node = source.to_ast_node();
+    let code = to_js_code(source.to_ast_node());
 
-    assert_snapshot!(format!("{:#?}", node), @r###"
-    Object(
-        ObjectLit {
-            span: 0..0#0,
-            props: [
-                Prop(
-                    KeyValue(
-                        KeyValueProp {
-                            key: Ident(
-                                Ident {
-                                    span: 0..0#0,
-                                    sym: "string",
-                                    optional: false,
-                                },
-                            ),
-                            value: Lit(
-                                Str(
-                                    Str {
-                                        span: 0..0#0,
-                                        value: "string",
-                                        raw: None,
-                                    },
-                                ),
-                            ),
-                        },
-                    ),
-                ),
-                Prop(
-                    KeyValue(
-                        KeyValueProp {
-                            key: Ident(
-                                Ident {
-                                    span: 0..0#0,
-                                    sym: "number",
-                                    optional: false,
-                                },
-                            ),
-                            value: Lit(
-                                Num(
-                                    Number {
-                                        span: 0..0#0,
-                                        value: 32.0,
-                                        raw: None,
-                                    },
-                                ),
-                            ),
-                        },
-                    ),
-                ),
-                Prop(
-                    KeyValue(
-                        KeyValueProp {
-                            key: Ident(
-                                Ident {
-                                    span: 0..0#0,
-                                    sym: "bool",
-                                    optional: false,
-                                },
-                            ),
-                            value: Lit(
-                                Bool(
-                                    Bool {
-                                        span: 0..0#0,
-                                        value: true,
-                                    },
-                                ),
-                            ),
-                        },
-                    ),
-                ),
-                Prop(
-                    KeyValue(
-                        KeyValueProp {
-                            key: Ident(
-                                Ident {
-                                    span: 0..0#0,
-                                    sym: "vec",
-                                    optional: false,
-                                },
-                            ),
-                            value: Array(
-                                ArrayLit {
-                                    span: 0..0#0,
-                                    elems: [
-                                        Some(
-                                            ExprOrSpread {
-                                                spread: None,
-                                                expr: Lit(
-                                                    Bool(
-                                                        Bool {
-                                                            span: 0..0#0,
-                                                            value: true,
-                                                        },
-                                                    ),
-                                                ),
-                                            },
-                                        ),
-                                    ],
-                                },
-                            ),
-                        },
-                    ),
-                ),
-                Prop(
-                    KeyValue(
-                        KeyValueProp {
-                            key: Ident(
-                                Ident {
-                                    span: 0..0#0,
-                                    sym: "nested",
-                                    optional: false,
-                                },
-                            ),
-                            value: Object(
-                                ObjectLit {
-                                    span: 0..0#0,
-                                    props: [
-                                        Prop(
-                                            KeyValue(
-                                                KeyValueProp {
-                                                    key: Ident(
-                                                        Ident {
-                                                            span: 0..0#0,
-                                                            sym: "string",
-                                                            optional: false,
-                                                        },
-                                                    ),
-                                                    value: Lit(
-                                                        Str(
-                                                            Str {
-                                                                span: 0..0#0,
-                                                                value: "string",
-                                                                raw: None,
-                                                            },
-                                                        ),
-                                                    ),
-                                                },
-                                            ),
-                                        ),
-                                    ],
-                                },
-                            ),
-                        },
-                    ),
-                ),
-            ],
-        },
-    )
+    assert_snapshot!(code, @r###"
+    {
+        string: "string",
+        number: 32,
+        bool: true,
+        vec: [
+            true
+        ],
+        nested: {
+            string: "string"
+        }
+    };
     "###);
 }
