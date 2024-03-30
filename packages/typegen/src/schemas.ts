@@ -16,8 +16,7 @@ export const fnSchema = z.object({
   loc: locSchema,
 });
 
-// export const branchType = z.enum(['if', 'else']);
-export const branchType = z.string();
+export const branchType = z.enum(['if', 'else']);
 
 export const branchSchema = z.object({
   type: branchType,

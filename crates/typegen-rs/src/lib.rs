@@ -40,7 +40,7 @@ mod test {
                     start: 1.0,
                     end: 1.0,
                 },
-                type_: String::from("if"),
+                type_: CoverageDataBranchesItemType::If,
             }],
         };
 
