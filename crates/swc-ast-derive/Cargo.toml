@@ -1,17 +1,17 @@
 [package]
-name = "swc_plugin_zion"
+name = "swc_ast_derive"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-crate-type = ["cdylib"]
+name = "swc_ast_derive"
+path = "src/lib.rs"
+proc-macro = true
 
 [dependencies]
-hex-literal = "0.4.1"
-random-string = "1.1.0"
-serde = { version = "1.0.197", features = ["derive"] }
-serde_json = "1"
-sha1 = "0.10.6"
+proc-macro2 = "1.0.79"
+quote = "1.0.35"
+syn = { version = "2.0.55", features = ["extra-traits"] }
 swc_core = { version = "0.90.*", features = [
 	"ecma_plugin_transform",
 	"ecma_quote",
@@ -20,8 +20,9 @@ swc_core = { version = "0.90.*", features = [
 	"ecma_codegen",
 	"ecma_parser",
 ] }
-typegen_rs = { path = "../typegen-rs" }
 swc_ast_trait = { path = "../swc-ast-trait" }
+swc_helpers = { path = "../swc-helpers" }
+convert_case = "0.6.0"
 
 [dev-dependencies]
 insta = { version = "1.38.0", features = ["json"] }

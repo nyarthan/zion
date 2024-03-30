@@ -7,6 +7,17 @@ edition = "2021"
 serde = { version = "1.0.197", features = ["derive"] }
 serde_json = "1"
 typify = "0.0.16"
+swc_ast_derive = { path = "../swc-ast-derive" }
+swc_ast_trait = { path = "../swc-ast-trait" }
+swc_helpers = { path = "../swc-helpers" }
+swc_core = { version = "0.90.*", features = [
+	"ecma_plugin_transform",
+	"ecma_quote",
+	"ecma_utils",
+	"ecma_ast",
+	"ecma_codegen",
+	"ecma_parser",
+] }
 
 [dev-dependencies]
 insta = { version = "1.38.0", features = ["json"] }

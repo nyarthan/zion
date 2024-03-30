@@ -3,7 +3,7 @@ import * as path from 'node:path';
 
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
-import { coverageDataSchema } from './schemas';
+import { coverageDataSchema } from '../src/schemas';
 
 const outDir = path.join(process.cwd(), 'dist');
 
