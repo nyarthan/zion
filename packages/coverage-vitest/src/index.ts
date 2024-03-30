@@ -66,6 +66,7 @@ class Provider implements CoverageProvider {
   ): Promise<string | void | Partial<TransformResult> | null | undefined> {
     if (id.includes('math.ts')) {
       const { code } = await instrument(sourceCode);
+      console.debug(code);
       return { code };
     }
     noop(sourceCode, id, pluginCtx);

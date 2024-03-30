@@ -20,6 +20,8 @@ swc_core = { version = "0.90.*", features = [
 	"ecma_codegen",
 	"ecma_parser",
 ] }
+typegen_rs = { path = "../typegen-rs" }
+swc_ast_trait = { path = "../swc-ast-trait" }
 
 [dev-dependencies]
 insta = { version = "1.38.0", features = ["json"] }

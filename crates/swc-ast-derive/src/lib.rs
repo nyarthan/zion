@@ -2,8 +2,8 @@ use convert_case::{Case, Casing};
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
-    parse_macro_input, Data, DeriveInput, Fields, FieldsNamed, Ident, ImplGenerics, TypeGenerics,
-    Variant,
+    parse_macro_input, Data, DeriveInput, Fields, FieldsNamed, FieldsUnnamed, Ident, ImplGenerics,
+    TypeGenerics, Variant,
 };
 
 #[proc_macro_derive(ToAstStruct)]
@@ -15,8 +15,15 @@ pub fn derive_to_ast_struct(input: TokenStream) -> TokenStream {
 
     match input.data {
         Data::Struct(data_struct) => match data_struct.fields {
-            Fields::Named(fields_named) => generate_struct_impl(
+            Fields::Named(fields_named) => generate_named_struct_impl(
                 &fields_named,
+                struct_name,
+                impl_generics,
+                ty_generics,
+                where_clause,
+            ),
+            Fields::Unnamed(fields_unnamed) => generate_unnamed_struct_impl(
+                &fields_unnamed,
                 struct_name,
                 impl_generics,
                 ty_generics,
@@ -35,7 +42,7 @@ pub fn derive_to_ast_struct(input: TokenStream) -> TokenStream {
     }
 }
 
-fn generate_struct_impl(
+fn generate_named_struct_impl(
     fields_named: &FieldsNamed,
     struct_name: &Ident,
     impl_generics: ImplGenerics,
@@ -68,6 +75,29 @@ fn generate_struct_impl(
                         #(#field_accesses),*
                     ],
                 })
+            }
+        }
+    }
+    .into()
+}
+
+fn generate_unnamed_struct_impl(
+    fields_unnamed: &FieldsUnnamed,
+    struct_name: &Ident,
+    impl_generics: ImplGenerics,
+    ty_generics: TypeGenerics,
+    where_clause: Option<&syn::WhereClause>,
+) -> TokenStream {
+    let field = &fields_unnamed.unnamed[0];
+    if fields_unnamed.unnamed.len() != 1 {
+        panic!("nuh uh")
+    };
+    let name = &field.ident;
+
+    quote! {
+        impl #impl_generics ToAst for #struct_name #ty_generics #where_clause {
+            fn to_ast_node(&self) -> Expr {
+                self.#name.to_ast_node().into()
             }
         }
     }

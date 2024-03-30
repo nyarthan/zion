@@ -1,4 +1,6 @@
+use coverage::CoverageDataInject;
 use misc::gen_coverage_symbol;
+use swc_ast_trait::ToAst;
 use swc_core::ecma::utils::prepend_stmt;
 use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata};
 use swc_core::{
@@ -32,10 +34,7 @@ impl VisitMut for TransformVisitor {
                 decls: vec![VarDeclarator {
                     span: DUMMY_SP,
                     definite: false,
-                    init: Some(Box::new(Expr::Object(ObjectLit {
-                        span: DUMMY_SP,
-                        props: vec![],
-                    }))),
+                    init: Some(Box::new(CoverageDataInject::new().0.to_ast_node())),
                     name: Pat::Ident(BindingIdent {
                         id: Ident {
                             sym: self.module_coverage_sym.clone().into(),
