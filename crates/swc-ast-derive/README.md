@@ -7,6 +7,7 @@
 - HashSet<T> (? -> Vec<T>)
 - HashMap<T> (? -> struct)
 - boolean
-- tuples
-- enums
+- tuples (TODO)
+- enums (TODO)
+- Option<T> (TODO)
 - structs

@@ -11,12 +11,14 @@ export const stmtSchema = z.object({
 });
 
 export const fnSchema = z.object({
-  name: z.string().optional(),
+  // name: z.string().optional(),
+  name: z.string(),
   decl: locSchema,
   loc: locSchema,
 });
 
-export const branchType = z.enum(['if', 'else']);
+// export const branchType = z.enum(['if', 'else']);
+export const branchType = z.string();
 
 export const branchSchema = z.object({
   type: branchType,
