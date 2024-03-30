@@ -25,7 +25,7 @@ mod test {
                 end: 1.0,
             }],
             fns: vec![CoverageDataFnsItem {
-                name: String::from("fn"),
+                name: Some(String::from("fn")),
                 loc: CoverageDataFnsItemLoc {
                     end: 1.0,
                     start: 1.0,

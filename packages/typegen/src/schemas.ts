@@ -11,8 +11,7 @@ export const stmtSchema = z.object({
 });
 
 export const fnSchema = z.object({
-  // name: z.string().optional(),
-  name: z.string(),
+  name: z.string().optional(),
   decl: locSchema,
   loc: locSchema,
 });

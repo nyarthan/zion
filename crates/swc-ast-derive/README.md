@@ -9,5 +9,5 @@
 - boolean
 - tuples (TODO)
 - enums (TODO)
-- Option<T> (TODO)
+- Option<T>
 - structs

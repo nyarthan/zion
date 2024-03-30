@@ -52,6 +52,22 @@ where
     }
 }
 
+impl<T> ToAst for Option<T>
+where
+    T: ToAst,
+{
+    fn to_ast_node(&self) -> Expr {
+        match self {
+            Some(value) => value.to_ast_node(),
+            None => Expr::Ident(Ident {
+                sym: "undefined".into(),
+                span: DUMMY_SP,
+                optional: false,
+            }),
+        }
+    }
+}
+
 impl<T> ToAst for Vec<T>
 where
     T: ToAst,
