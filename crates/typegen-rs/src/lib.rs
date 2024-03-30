@@ -42,6 +42,7 @@ mod test {
                 },
                 type_: CoverageDataBranchesItemType::If,
             }],
+            // test_field: CoverageDataTestField(1.0),
         };
 
         let code = to_js_code(coverage_data.to_ast_node());
