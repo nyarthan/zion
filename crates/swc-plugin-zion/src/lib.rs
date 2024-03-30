@@ -1,3 +1,5 @@
+use misc::gen_coverage_symbol;
+use swc_core::ecma::utils::prepend_stmt;
 use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata};
 use swc_core::{
     common::DUMMY_SP,
@@ -8,61 +10,22 @@ use swc_core::{
     },
 };
 
-pub struct TransformVisitor;
+mod coverage;
+mod misc;
+
+pub struct TransformVisitor {
+    module_coverage_sym: String,
+}
 
 const COVERAGE_GLOBAL: &'static str = "globalThis";
 const COVERAGE_KEY: &'static str = "__ZION_COVERAGE__";
 
 impl VisitMut for TransformVisitor {
-    fn visit_mut_arrow_expr(&mut self, arrow_expr: &mut ArrowExpr) {
-        arrow_expr.visit_mut_children_with(self);
-
-        if let BlockStmtOrExpr::BlockStmt(ret) = &*arrow_expr.body {
-            let mut stmts = Vec::new();
-
-            stmts.push(Stmt::Expr(ExprStmt {
-                span: DUMMY_SP,
-                expr: Box::new(Expr::Call(CallExpr {
-                    callee: Callee::Expr(Box::new(Expr::Member(MemberExpr {
-                        obj: Box::new(Expr::Ident(Ident {
-                            sym: "console".into(),
-                            optional: false,
-                            span: DUMMY_SP,
-                        })),
-                        prop: MemberProp::Ident(Ident {
-                            sym: "log".into(),
-                            optional: false,
-                            span: DUMMY_SP,
-                        }),
-                        span: DUMMY_SP,
-                    }))),
-                    args: vec![ExprOrSpread {
-                        spread: None,
-                        expr: Box::new(Expr::Lit(Lit::Str(Str {
-                            value: "hi".into(),
-                            raw: None,
-                            span: DUMMY_SP,
-                        }))),
-                    }],
-                    type_args: None,
-                    span: DUMMY_SP,
-                })),
-            }));
-
-            stmts.push(ret.stmts.last().unwrap().clone());
-
-            arrow_expr.body = Box::new(BlockStmtOrExpr::BlockStmt(BlockStmt {
-                span: DUMMY_SP,
-                stmts,
-            }));
-        }
-    }
-
     fn visit_mut_module(&mut self, module: &mut Module) {
         module.visit_mut_children_with(self);
 
-        module.body.insert(
-            0,
+        prepend_stmt(
+            &mut module.body,
             ModuleItem::Stmt(Stmt::Decl(Decl::Var(Box::new(VarDecl {
                 span: DUMMY_SP,
                 kind: VarDeclKind::Const,
@@ -75,7 +38,7 @@ impl VisitMut for TransformVisitor {
                     }))),
                     name: Pat::Ident(BindingIdent {
                         id: Ident {
-                            sym: "coverage".into(),
+                            sym: self.module_coverage_sym.clone().into(),
                             optional: false,
                             span: DUMMY_SP,
                         },
@@ -90,25 +53,17 @@ impl VisitMut for TransformVisitor {
             span: DUMMY_SP,
             expr: Box::new(Expr::Assign(AssignExpr {
                 span: DUMMY_SP,
-                op: AssignOp::Assign,
+                op: op!("="),
                 left: AssignTarget::Simple(SimpleAssignTarget::Member(MemberExpr {
                     span: DUMMY_SP,
-                    obj: Box::new(Expr::Ident(Ident {
-                        span: DUMMY_SP,
-                        optional: false,
-                        sym: COVERAGE_GLOBAL.into(),
-                    })),
+                    obj: ident_expr!(COVERAGE_GLOBAL),
                     prop: MemberProp::Ident(Ident {
                         span: DUMMY_SP,
                         optional: false,
                         sym: COVERAGE_KEY.into(),
                     }),
                 })),
-                right: Box::new(Expr::Ident(Ident {
-                    span: DUMMY_SP,
-                    optional: false,
-                    sym: "coverage".into(),
-                })),
+                right: ident_expr!(self.module_coverage_sym.clone()),
             })),
         })));
     }
@@ -123,25 +78,38 @@ impl VisitMut for TransformVisitor {
                     span: DUMMY_SP,
                     expr: Box::new(Expr::Assign(AssignExpr {
                         span: DUMMY_SP,
-                        op: AssignOp::Assign,
+                        op: op!("="),
                         left: AssignTarget::Simple(SimpleAssignTarget::Member(MemberExpr {
                             span: DUMMY_SP,
-                            obj: Box::new(Expr::Ident(Ident {
-                                span: DUMMY_SP,
-                                optional: false,
-                                sym: "coverage".into(),
-                            })),
+                            obj: ident_expr!(self.module_coverage_sym.clone()),
                             prop: MemberProp::Ident(Ident {
                                 span: DUMMY_SP,
                                 optional: false,
-                                sym: "add".into(),
+                                sym: fn_decl.ident.sym.clone(),
                             }),
                         })),
-                        right: Box::new(Expr::Lit(Lit::Num(Number {
+                        right: Box::new(Expr::Bin(BinExpr {
                             span: DUMMY_SP,
-                            value: 1.0,
-                            raw: None,
-                        }))),
+                            op: op!(bin, "+"),
+                            left: Box::new(Expr::Paren(ParenExpr {
+                                span: DUMMY_SP,
+                                expr: Box::new(Expr::Bin(BinExpr {
+                                    span: DUMMY_SP,
+                                    op: op!("??"),
+                                    left: Box::new(Expr::Member(MemberExpr {
+                                        span: DUMMY_SP,
+                                        obj: ident_expr!(self.module_coverage_sym.clone()),
+                                        prop: MemberProp::Ident(Ident {
+                                            span: DUMMY_SP,
+                                            optional: false,
+                                            sym: fn_decl.ident.sym.clone(),
+                                        }),
+                                    })),
+                                    right: num_lit_expr!(0.),
+                                })),
+                            })),
+                            right: num_lit_expr!(1.),
+                        })),
                     })),
                 }),
             )
@@ -149,14 +117,61 @@ impl VisitMut for TransformVisitor {
     }
 }
 
+#[macro_export]
+macro_rules! num_lit_expr {
+    ($value:expr) => {
+        Box::new(Expr::Lit(Lit::Num(Number {
+            span: DUMMY_SP,
+            value: $value,
+            raw: None,
+        })))
+    };
+}
+
+#[macro_export]
+macro_rules! ident_expr {
+    ($value:expr) => {
+        Box::new(Expr::Ident(Ident {
+            span: DUMMY_SP,
+            optional: false,
+            sym: $value.into(),
+        }))
+    };
+}
+
+#[macro_export]
+macro_rules! empty_coverage_data {
+    ($value:expr) => {
+        quote!(
+            r#"
+{
+    modulePath: '/path/to/module.js',
+    stmtMap: {},
+    fnMap: {},
+    branchMap: {},
+    coverage: {
+        stmt: {},
+        fn: {},
+        branch: {}
+    }
+}
+"# as Expr
+        )
+    };
+}
+
 #[plugin_transform]
 pub fn process_transform(program: Program, _metadata: TransformPluginProgramMetadata) -> Program {
-    program.fold_with(&mut as_folder(TransformVisitor))
+    program.fold_with(&mut as_folder(TransformVisitor {
+        module_coverage_sym: format!("coverage_{}", gen_coverage_symbol("this is a test")),
+    }))
 }
 
 test_inline!(
     Default::default(),
-    |_| as_folder(TransformVisitor),
+    |_| as_folder(TransformVisitor {
+        module_coverage_sym: String::from("coverage")
+    }),
     module_coverage,
     // Input
     r#"
@@ -168,9 +183,9 @@ function add(a, b) {
     r#"
 const coverage = {};
 function add(a, b) {
-    coverage.add = 1;
+    coverage.add = (coverage.add ?? 0) + 1;
     return a + b;
 }
-globalThis.__VITEST_COVERAGE__ = coverage;
+globalThis.__ZION_COVERAGE__ = coverage;
 "#
 );

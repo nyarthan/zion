@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@zion/typegen-rs",
+  "type": "module",
+  "scripts": {
+    "build": "tsx ./scripts/build.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@zion/typegen": "workspace:*",
+    "zod": "3.22.4",
+    "zod-to-json-schema": "3.22.5"
+  },
+  "devDependencies": {
+    "tsx": "4.7.1"
+  }
+}
