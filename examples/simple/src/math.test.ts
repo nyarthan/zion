@@ -97,6 +97,28 @@ it('adds', (...[...[{ task: alias, ...ctx }]]) => {
   expect(add(1, 2)).toBe(3);
 });
 
+it('adds', ({ task: { id } }) => {
+  console.debug(id);
+  expect(add(1, 2)).toBe(3);
+});
+
+it('adds', ({ task: { id } }, other) => {
+  console.debug(id);
+  expect(add(1, 2)).toBe(3);
+});
+
+// prettier-ignore
+it('adds', (...[{task: {id}}]) => {
+  console.debug(id);
+  expect(add(1, 2)).toBe(3);
+});
+
+// prettier-ignore
+it('adds', (...[{task: {id}}, other]) => {
+  console.debug(id);
+  expect(add(1, 2)).toBe(3);
+});
+
 //
 // it('subtracts', () => {
 //   expect(subtract(3, 2)).toBe(1);
