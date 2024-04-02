@@ -58,7 +58,7 @@ impl VisitMut for TestTransformVisitor {
                     // TODO: this really needs refactoring
                     match pat.access_pat_ident("task") {
                         Some(expr) => {
-                            let declaration = Stmt::Decl(Decl::Var(Box::new(VarDecl {
+                            let declaration = Decl::Var(Box::new(VarDecl {
                                 span: DUMMY_SP,
                                 kind: VarDeclKind::Const,
                                 declare: false,
@@ -73,12 +73,12 @@ impl VisitMut for TestTransformVisitor {
                                         },
                                     }),
                                     definite: false,
-                                    init: Some(Box::new(expr)),
+                                    init: Some(expr.into()),
                                 }],
-                            })));
+                            }));
 
                             if let BlockStmtOrExpr::BlockStmt(BlockStmt { stmts, .. }) = body {
-                                prepend_stmt(stmts, declaration)
+                                prepend_stmt(stmts, declaration.into())
                             }
                         }
                         None => {
@@ -95,7 +95,7 @@ impl VisitMut for TestTransformVisitor {
                                     type_ann: None,
                                     span: DUMMY_SP,
                                     dot3_token: DUMMY_SP,
-                                    arg: Box::new(Pat::Ident(ident.clone().into())),
+                                    arg: Pat::Ident(ident.clone().into()).into(),
                                 }));
 
                                 if let Pat::Array(array_pat) = &**arg {
@@ -104,14 +104,14 @@ impl VisitMut for TestTransformVisitor {
                                         kind: VarDeclKind::Const,
                                         decls: vec![VarDeclarator {
                                             span: DUMMY_SP,
-                                            init: Some(Box::new(Expr::Ident(ident.clone()))),
+                                            init: Some(Expr::Ident(ident.clone()).into()),
                                             definite: false,
-                                            name: Pat::Array(array_pat.clone()),
+                                            name: array_pat.clone().into(),
                                         }],
                                         declare: false,
                                     };
 
-                                    let declaration = Stmt::Decl(Decl::Var(Box::new(VarDecl {
+                                    let declaration = Decl::Var(Box::new(VarDecl {
                                         span: DUMMY_SP,
                                         kind: VarDeclKind::Const,
                                         declare: false,
@@ -126,36 +126,41 @@ impl VisitMut for TestTransformVisitor {
                                                 },
                                             }),
                                             definite: false,
-                                            init: Some(Box::new(Expr::Member(MemberExpr {
-                                                span: DUMMY_SP,
-                                                obj: Box::new(Expr::Member(MemberExpr {
+                                            init: Some(
+                                                Expr::Member(MemberExpr {
                                                     span: DUMMY_SP,
-                                                    obj: Box::new(Expr::Ident(ident)),
-                                                    prop: MemberProp::Computed(ComputedPropName {
+                                                    obj: Expr::Member(MemberExpr {
                                                         span: DUMMY_SP,
-                                                        expr: Box::new(Expr::Lit(Lit::Num(
-                                                            Number {
+                                                        obj: Expr::Ident(ident).into(),
+                                                        prop: MemberProp::Computed(
+                                                            ComputedPropName {
                                                                 span: DUMMY_SP,
-                                                                value: 0.0,
-                                                                raw: None,
+                                                                expr: Expr::Lit(Lit::Num(Number {
+                                                                    span: DUMMY_SP,
+                                                                    value: 0.0,
+                                                                    raw: None,
+                                                                }))
+                                                                .into(),
                                                             },
-                                                        ))),
+                                                        ),
+                                                    })
+                                                    .into(),
+                                                    prop: MemberProp::Ident(Ident {
+                                                        span: DUMMY_SP,
+                                                        sym: "task".into(),
+                                                        optional: false,
                                                     }),
-                                                })),
-                                                prop: MemberProp::Ident(Ident {
-                                                    span: DUMMY_SP,
-                                                    sym: "task".into(),
-                                                    optional: false,
-                                                }),
-                                            }))),
+                                                })
+                                                .into(),
+                                            ),
                                         }],
-                                    })));
+                                    }));
 
                                     if let BlockStmtOrExpr::BlockStmt(BlockStmt { stmts, .. }) =
                                         body
                                     {
-                                        prepend_stmt(stmts, Stmt::Decl(decl.into()));
-                                        prepend_stmt(stmts, declaration);
+                                        prepend_stmt(stmts, decl.into());
+                                        prepend_stmt(stmts, declaration.into());
                                     }
 
                                     arrow_expr.params = params;
@@ -178,10 +183,10 @@ impl VisitMut for TestTransformVisitor {
                                         span: DUMMY_SP,
                                         name: pat.clone(),
                                         definite: false,
-                                        init: Some(Box::new(Expr::Ident(ident.clone()))),
+                                        init: Some(Expr::Ident(ident.clone()).into()),
                                     }],
                                 };
-                                let declaration = Stmt::Decl(Decl::Var(Box::new(VarDecl {
+                                let declaration = Decl::Var(Box::new(VarDecl {
                                     span: DUMMY_SP,
                                     kind: VarDeclKind::Const,
                                     declare: false,
@@ -196,21 +201,24 @@ impl VisitMut for TestTransformVisitor {
                                             },
                                         }),
                                         definite: false,
-                                        init: Some(Box::new(Expr::Member(MemberExpr {
-                                            span: DUMMY_SP,
-                                            obj: Box::new(Expr::Ident(ident)),
-                                            prop: MemberProp::Ident(Ident {
+                                        init: Some(
+                                            Expr::Member(MemberExpr {
                                                 span: DUMMY_SP,
-                                                optional: false,
-                                                sym: "task".into(),
-                                            }),
-                                        }))),
+                                                obj: Expr::Ident(ident).into(),
+                                                prop: MemberProp::Ident(Ident {
+                                                    span: DUMMY_SP,
+                                                    optional: false,
+                                                    sym: "task".into(),
+                                                }),
+                                            })
+                                            .into(),
+                                        ),
                                     }],
-                                })));
+                                }));
 
                                 if let BlockStmtOrExpr::BlockStmt(BlockStmt { stmts, .. }) = body {
-                                    prepend_stmt(stmts, Stmt::Decl(decl.into()));
-                                    prepend_stmt(stmts, declaration);
+                                    prepend_stmt(stmts, decl.into());
+                                    prepend_stmt(stmts, declaration.into());
                                 }
                                 arrow_expr.params = p;
                             }
