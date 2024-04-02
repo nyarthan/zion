@@ -22,6 +22,7 @@ swc_core = { version = "0.90.*", features = [
 ] }
 typegen_rs = { path = "../typegen-rs" }
 swc_ast_trait = { path = "../swc-ast-trait" }
+lazy_static = "1.4.0"
 
 [dev-dependencies]
 insta = { version = "1.38.0", features = ["json"] }

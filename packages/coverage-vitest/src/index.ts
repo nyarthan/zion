@@ -65,8 +65,10 @@ class Provider implements CoverageProvider {
     _pluginCtx: any,
   ): Promise<string | void | Partial<TransformResult> | null | undefined> {
     if (id.endsWith('vite/dist/client/env.mjs')) return { code: sourceCode };
+    if (isTestFile(id)) {
+      console.debug((await instrument(sourceCode, { type: 'test' })).code);
+    }
     const { code } = await instrument(sourceCode, { type: isTestFile(id) ? 'test' : 'source' });
-    console.debug(code);
     return { code };
   }
 }
