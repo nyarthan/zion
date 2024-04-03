@@ -56,7 +56,7 @@ class Provider implements CoverageProvider {
 
   onAfterSuiteRun(meta: AfterSuiteRunMeta): void | Promise<void> {
     const coverage = meta.coverage as GlobalCoverage;
-    console.debug(coverage);
+    // console.debug(coverage);
   }
 
   async onFileTransform(
