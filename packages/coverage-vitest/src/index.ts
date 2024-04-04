@@ -56,7 +56,8 @@ class Provider implements CoverageProvider {
 
   onAfterSuiteRun(meta: AfterSuiteRunMeta): void | Promise<void> {
     const coverage = meta.coverage as GlobalCoverage;
-    // console.debug(coverage);
+    console.debug('#### COVERAGE DATA ####');
+    console.debug(coverage);
   }
 
   async onFileTransform(
@@ -65,9 +66,9 @@ class Provider implements CoverageProvider {
     _pluginCtx: any,
   ): Promise<string | void | Partial<TransformResult> | null | undefined> {
     if (id.endsWith('vite/dist/client/env.mjs')) return { code: sourceCode };
-    if (isTestFile(id)) {
+    /* if (isTestFile(id)) {
       console.debug((await instrument(sourceCode, { type: 'test' })).code);
-    }
+    } */
     const { code } = await instrument(sourceCode, { type: isTestFile(id) ? 'test' : 'source' });
     return { code };
   }

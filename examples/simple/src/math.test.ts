@@ -2,179 +2,210 @@ import { expect, it } from 'vitest';
 
 import { add } from './math';
 
-it('adds', (ctx) => {
-  console.log(ctx.task);
+// prettier-ignore-start
+it('adds ()', (ctx) => {
+  // console.log(ctx.task);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', (ctx = 1 as any) => {
-  console.log(ctx.task);
+it('adds (default value)', (ctx = 1 as any) => {
+  // console.log(ctx.task);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', ({ task }) => {
-  console.debug(task.id);
+it('adds (object destructured)', ({ task }) => {
+  // console.debug(task.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', ({ task } = 1 as any) => {
-  console.debug(task.id);
+it('adds (default value, object destructured)', ({ task } = 1 as any) => {
+  // console.debug(task.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', ({ task = 1 as any }) => {
-  console.debug(task.id);
+it('adds (object destructured, task default value)', ({ task = 1 as any }) => {
+  // console.debug(task.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', ({ task: alias }) => {
-  console.debug(alias.id);
+it('adds (object destructured, task aliased)', ({ task: alias }) => {
+  // console.debug(alias.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', ({ ...ctx }) => {
-  console.debug(ctx.task.id);
+it('adds (object destructured, fully spread)', ({ ...ctx }) => {
+  // console.debug(ctx.task.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', ({ task, ...ctx }) => {
-  console.debug(task.id);
+it('adds (object destructured, partially spread)', ({ task, ...ctx }) => {
+  // console.debug(task.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', ({ task: alias, ...ctx }) => {
-  console.debug(alias.id);
+it('adds (object destructured, partially spread, task aliased)', ({ task: alias, ...ctx }) => {
+  // console.debug(alias.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', (...[ctx]) => {
-  console.debug(ctx.task.id);
+it('adds (args spread, array destructured)', (...[ctx]) => {
+  // console.debug(ctx.task.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', (...[ctx = 1 as any]) => {
-  console.debug(ctx.task.id);
+it('adds (args spread, array destructured, ctx default value)', (...[ctx = 1 as any]) => {
+  // console.debug(ctx.task.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', (...[{ task }]) => {
-  console.debug(task.id);
+it('adds (args spread, array destructured, object destructured)', (...[{ task }]) => {
+  // console.debug(task.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', (...[{ task: alias }]) => {
-  console.debug(alias.id);
+it('adds (args spread, array destructured, object destructured, task aliased)', (...[
+  { task: alias },
+]) => {
+  // console.debug(alias.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', (...[{ ...ctx }]) => {
-  console.debug(ctx.task.id);
+it('adds (args spread, array destructured, object destructured, fully spread)', (...[
+  { ...ctx },
+]) => {
+  // console.debug(ctx.task.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', (...[{ task, ...ctx }]) => {
-  console.debug(task.id);
+it('adds (args spread, array destructured, object destructured, partially spread)', (...[
+  { task, ...ctx },
+]) => {
+  // console.debug(task.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', (...[{ task: alias, ...ctx }]) => {
-  console.debug(alias.id);
+it('adds (args spread, array destructured, object destructured, partially spread, task aliased)', (...[
+  { task: alias, ...ctx },
+]) => {
+  // console.debug(alias.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', (...[...[{ task }]]) => {
-  console.debug(task.id);
+it('adds (args spread, array destructured twice, object destructured)', (...[...[{ task }]]) => {
+  // console.debug(task.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', (...[...[{ task: alias }]]) => {
-  console.debug(alias.id);
+it('adds (args spread, array destructured twice, object destructured, task aliased)', (...[
+  ...[{ task: alias }]
+]) => {
+  // console.debug(alias.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', (...[...[{ task: alias, ...ctx }]]) => {
-  console.debug(alias.id);
+it('adds (args spread, array destructured twice, object destructured, partially spread, task aliased)', (...[
+  ...[{ task: alias, ...ctx }]
+]) => {
+  // console.debug(alias.id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', ({ task: { id } }) => {
-  console.debug(id);
+it('adds (object destructured 2 levels)', ({ task: { id } }) => {
+  // console.debug(id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', ({ task: { id } }, other) => {
-  console.debug(id);
+// @ts-expect-error don't care - this is valid
+it('adds (object destructured 2 levels, 2. arg)', ({ task: { id } }, other) => {
+  // console.debug(id);
   expect(add(1, 2)).toBe(3);
 });
 
-// prettier-ignore
-it('adds', (...[{task: {id}}]) => {
-  console.debug(id);
+it('adds (args spread, array destructured, object destructured 2 levels)', (...[
+  {
+    task: { id },
+  },
+]) => {
+  // console.debug(id);
   expect(add(1, 2)).toBe(3);
 });
 
-// prettier-ignore
-it('adds', (...[{task: {id}}, other]) => {
-  console.debug(id);
+// @ts-expect-error don't care - this is valid
+it('adds (args spread, array destructured, object destructured 2 levels, 2. array member)', (...[
+  {
+    task: { id },
+  },
+  other,
+]) => {
+  // console.debug(id);
   expect(add(1, 2)).toBe(3);
 });
 
-it('adds', (ctx) => {
+it('adds ()', (ctx) => {
   expect(add(1, 2)).toBe(3);
 });
 
-it.concurrent('adds', () => {
+it.concurrent('adds (concurrent)', () => {
   expect(add(1, 2)).toBe(3);
 });
 
-it.sequential('adds', () => {
+it.sequential('adds (sequential)', () => {
   expect(add(1, 2)).toBe(3);
 });
 
-it.only('adds', () => {
+/* it.only('adds (only)', () => {
+  expect(add(1, 2)).toBe(3);
+}); */
+
+it.skip('adds (skip)', () => {
   expect(add(1, 2)).toBe(3);
 });
 
-it.skip('adds', () => {
+it.todo('adds (todo)', () => {
   expect(add(1, 2)).toBe(3);
 });
 
-it.todo('adds', () => {
-  expect(add(1, 2)).toBe(3);
+it.fails('adds (fails)', () => {
+  expect(add(1, 2)).toBe(4);
 });
 
-it.fails('adds', () => {
-  expect(add(1, 2)).toBe(3);
-});
-
-// prettier-ignore
-it.each([[1, 2, 3], [4, 5, 9]])('adds', (a, b, c) => {
+it.each([
+  [1, 2, 3],
+  [4, 5, 9],
+])('adds (each)', (a, b, c) => {
   expect(add(a, b)).toBe(c);
 });
 
-it.runIf(true)('adds', () => {
+it.runIf(true)('adds (runIf)', () => {
   expect(add(1, 2)).toBe(3);
 });
 
-it.skipIf(true)('adds', () => {
+it.skipIf(true)('adds (skipIf)', () => {
   expect(add(1, 2)).toBe(3);
 });
 
-it.concurrent.concurrent('adds', () => {
+it.concurrent.concurrent('adds (concurrent, concurrent)', () => {
   expect(add(1, 2)).toBe(3);
 });
 
-// prettier-ignore
-it.concurrent.each([[1, 2, 3], [4, 5, 9]])('adds', (a, b, c) => {
+it.concurrent.each([
+  [1, 2, 3],
+  [4, 5, 9],
+])('adds (concurrent, each)', (a, b, c) => {
   expect(add(a, b)).toBe(c);
 });
 
-// prettier-ignore
-it.runIf(true).each([[1, 2, 3], [4, 5, 9]])('adds', (a, b, c) => {
+it.runIf(true).each([
+  [1, 2, 3],
+  [4, 5, 9],
+])('adds (runIf, each)', (a, b, c) => {
   expect(add(a, b)).toBe(c);
 });
 
-// prettier-ignore
-it.runIf(true).concurrent.skip.each([[1, 2, 3], [4, 5, 9]])('adds', (a, b, c) => {
+it.runIf(true).concurrent.skip.each([
+  [1, 2, 3],
+  [4, 5, 9],
+])('adds (runIf, concurrent, skip, each)', (a, b, c) => {
   expect(add(a, b)).toBe(c);
 });
+// prettier-ignore-end

@@ -11,6 +11,7 @@ mod ast;
 mod coverage;
 mod misc;
 mod visitor;
+mod vitest;
 
 use visitor::{source::SourceTransformVisitor, test::TestTransformVisitor};
 

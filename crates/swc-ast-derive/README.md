@@ -1,13 +1,17 @@
 # swc_ast_derive
 
-## gen for types (not exhaustive)
+Procedural Macro for generating swc AST nodes for simple rust types.
 
-- String
-- Vec<T>
-- HashSet<T> (? -> Vec<T>)
-- HashMap<T> (? -> struct)
-- boolean
-- tuples (TODO)
-- enums (TODO)
-- Option<T>
-- structs
+See [./tests/derive.rs](./tests/derive.rs) for usage example.
+
+Works with following types:
+
+- `String` -> string literal
+- `Vec<T>` where `T` is any of the listed types -> array literal
+- `HashSet<T>` where `T` is any of the listed types -> array literal
+- `HashMap<T>` -> object literal
+- `boolean` -> boolean
+- `tuple` -> _not implemented_
+- `Option` -> derive for `T` or `undefined`
+- enum -> string literal
+- struct -> object literal

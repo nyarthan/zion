@@ -1,6 +1,12 @@
 use std::collections::HashSet;
 
-use crate::visitor::pat_ident_access::PatIdentAccess;
+use crate::{
+    visitor::pat_ident_access::PatIdentAccess,
+    vitest::{
+        storage::{new_global_storage, new_storage_import, storage_member_expr},
+        test::{get_test_expr, TestExpr, TestModifer},
+    },
+};
 
 use lazy_static::lazy_static;
 use swc_core::{
@@ -22,14 +28,29 @@ pub struct TestTransformVisitor {
 }
 
 impl VisitMut for TestTransformVisitor {
+    fn visit_mut_module(&mut self, module: &mut Module) {
+        module.visit_mut_children_with(self);
+
+        prepend_stmt(&mut module.body, new_global_storage().into());
+        prepend_stmt(&mut module.body, new_storage_import());
+    }
+
     fn visit_mut_call_expr(&mut self, call_expr: &mut CallExpr) {
         call_expr.visit_mut_children_with(self);
 
         // TODO: it.each expressions need to be transformed to describe.each -> it to get access to
         // test context
-        if !is_test_expr(call_expr) {
-            return;
+        let test_expr = get_test_expr(call_expr);
+
+        if let Some(TestExpr { modifiers, .. }) = &test_expr {
+            if modifiers.contains(&TestModifer::Each) {
+                return;
+            }
         };
+
+        if test_expr.is_none() {
+            return;
+        }
 
         if let Some(ExprOrSpread { expr, .. }) = call_expr.args.get_mut(1) {
             if let Expr::Arrow(arrow_expr) = &mut **expr {
@@ -60,29 +81,8 @@ impl VisitMut for TestTransformVisitor {
 
                 // TODO: this really needs refactoring
                 match pat.access_pat_ident("task") {
-                    Some(expr) => {
-                        let declaration = Decl::Var(Box::new(VarDecl {
-                            span: DUMMY_SP,
-                            kind: VarDeclKind::Const,
-                            declare: false,
-                            decls: vec![VarDeclarator {
-                                span: DUMMY_SP,
-                                name: Pat::Ident(BindingIdent {
-                                    type_ann: None,
-                                    id: Ident {
-                                        span: DUMMY_SP,
-                                        sym: "__task".into(),
-                                        optional: false,
-                                    },
-                                }),
-                                definite: false,
-                                init: Some(expr.into()),
-                            }],
-                        }));
-
-                        if let BlockStmtOrExpr::BlockStmt(BlockStmt { stmts, .. }) = body {
-                            prepend_stmt(stmts, declaration.into())
-                        }
+                    Some(_expr) => {
+                        // println!("got an expression");
                     }
                     None => {
                         if let Pat::Rest(RestPat { arg, .. }) = pat {
@@ -226,38 +226,4 @@ impl VisitMut for TestTransformVisitor {
             }
         }
     }
-}
-
-fn is_test_expr(call_expr: &CallExpr) -> bool {
-    match &call_expr.callee {
-        Callee::Expr(expr) => is_test_callee(&expr),
-        _ => false,
-    }
-}
-
-fn is_test_callee(expr: &Expr) -> bool {
-    match expr {
-        Expr::Ident(Ident { sym, .. }) => is_test_sym(sym.as_str()),
-
-        Expr::Member(MemberExpr { obj, prop, .. }) => {
-            (match &**obj {
-                Expr::Ident(Ident { sym, .. }) if is_test_sym(sym.as_str()) => true,
-                other => is_test_callee(other),
-            }) && is_modifier_prop(prop)
-        }
-
-        Expr::Call(CallExpr {
-            callee: Callee::Expr(inner_expr),
-            ..
-        }) => is_test_callee(inner_expr),
-
-        _ => false,
-    }
-}
-
-fn is_test_sym(sym: &str) -> bool {
-    sym == "it" || sym == "test"
-}
-fn is_modifier_prop(prop: &MemberProp) -> bool {
-    matches!(prop, MemberProp::Ident(Ident { sym, .. }) if matches!(sym.as_str(), "concurrent" | "sequential" | "only" | "skip" | "todo" | "fails" | "each" | "runIf" | "skipIf"))
 }
