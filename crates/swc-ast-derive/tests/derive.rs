@@ -13,6 +13,8 @@ fn works() {
         bool: bool,
         vec: Vec<bool>,
         nested: Nested,
+        none: Option<String>,
+        some: Option<String>
     }
 
     #[derive(ToAstStruct)]
@@ -28,6 +30,8 @@ fn works() {
         nested: Nested {
             string: String::from("string"),
         },
+        none: None,
+        some: Some(String::from("string"))
     };
     let code = to_js_code(source.to_ast_node());
 
@@ -41,7 +45,9 @@ fn works() {
         ],
         nested: {
             string: "string"
-        }
+        },
+        none: undefined,
+        some: "string"
     };
     "###);
 }

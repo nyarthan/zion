@@ -1,22 +1,20 @@
 import { createRequire } from 'node:module';
 
-import { Options, transform } from '@swc/core';
+import { transform } from '@swc/core';
 
 const require = createRequire(import.meta.url);
 const pluginPath = require.resolve('@zion/swc-plugin');
 
-const options: Options = {
-  jsc: {
-    parser: {
-      syntax: 'ecmascript',
-      jsx: true,
-    },
-    experimental: {
-      plugins: [[pluginPath, {}]],
-    },
-  },
+export type InstrumentOptions = {
+  type: 'source' | 'test';
 };
 
-export async function instrument(source: string) {
-  return transform(source, options);
+export async function instrument(source: string, options: InstrumentOptions) {
+  return transform(source, {
+    jsc: {
+      parser: { syntax: 'ecmascript', jsx: true },
+      target: 'esnext',
+      experimental: { plugins: [[pluginPath, { type: options.type }]] },
+    },
+  });
 }

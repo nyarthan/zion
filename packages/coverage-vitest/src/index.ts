@@ -10,7 +10,7 @@ import type {
 
 import { instrument } from '@zion/instrument';
 
-import { noop } from './util';
+import { isTestFile, noop } from './util';
 
 type GlobalCoverage = Record<string, unknown>;
 
@@ -56,20 +56,21 @@ class Provider implements CoverageProvider {
 
   onAfterSuiteRun(meta: AfterSuiteRunMeta): void | Promise<void> {
     const coverage = meta.coverage as GlobalCoverage;
+    console.debug('#### COVERAGE DATA ####');
     console.debug(coverage);
   }
 
   async onFileTransform(
     sourceCode: string,
     id: string,
-    pluginCtx: any,
+    _pluginCtx: any,
   ): Promise<string | void | Partial<TransformResult> | null | undefined> {
-    if (id.includes('math.ts')) {
-      const { code } = await instrument(sourceCode);
-      console.debug(code);
-      return { code };
-    }
-    noop(sourceCode, id, pluginCtx);
+    if (id.endsWith('vite/dist/client/env.mjs')) return { code: sourceCode };
+    /* if (isTestFile(id)) {
+      console.debug((await instrument(sourceCode, { type: 'test' })).code);
+    } */
+    const { code } = await instrument(sourceCode, { type: isTestFile(id) ? 'test' : 'source' });
+    return { code };
   }
 }
 
